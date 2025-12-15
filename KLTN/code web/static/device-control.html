@@ -1,0 +1,285 @@
+<!--device-control.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>AIOT - Điều khiển thiết bị</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../static/styles.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-4 h-20 custom-header text-white">
+            <div class="flex items-center flex-1">
+                <div class="logo-container">
+                    <img src="../static/img/logo.png" alt="Logo" id="logo">
+                </div>
+                <div class="flex-1 text-center header-content">
+                    <h1 class="text-2xl font-bold">HỆ THỐNG GIÁM SÁT CHẤT LƯỢNG ĐẤT</h1>
+                </div>
+            </div>
+            <div class="relative flex items-center">
+                <div class="mr-4">
+                    <span id="current-time" class="text-white text-xl font-bold"></span>
+                </div>
+                <div class="relative inline-block mr-4">
+                    <i class="fas fa-bell text-white text-2xl cursor-pointer" id="notification-icon"></i>
+                    <span class="notification-badge" id="notification-count">0</span>
+                    <div id="notification-content" class="absolute right-0 mt-2 w-64 bg-white rounded shadow-lg hidden z-10">
+                        <div class="p-2 notification-list"></div>
+                    </div>
+                </div>
+                <div class="relative inline-block mr-4">
+                    <img src="../static/img/logo1.jpeg" alt="Logo" class="rounded-full w-10 h-10 object-contain"/>
+                </div>
+                <a class="logout-btn text-white px-4 py-2 rounded mr-6 hover:bg-red-600 transform hover:scale-105 transition-all duration-300 hover:shadow-lg" href="#">Đăng xuất</a>
+            </div>
+        </div>
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <!-- Sidebar -->
+            <div class="md:col-span-2 bg-white p-4 rounded shadow sidebar">
+                <ul class="sidebar-menu">
+                    <li class="flex items-center mb-2">
+                        <i class="fas fa-th-large mr-2"></i>
+                        <a class="text-gray-700 sidebar-text" href="data-sensor.html">DỮ LIỆU CẢM BIẾN</a>
+                    </li>
+                    <li class="flex items-center mb-2">
+                        <i class="fas fa-chart-line mr-2"></i>
+                        <a class="text-gray-700 sidebar-text" href="chart.html">BIỂU ĐỒ</a>
+                    </li>
+                    <li class="flex items-center mb-2 active">
+                        <i class="fas fa-cogs mr-2"></i>
+                        <a class="text-gray-700 sidebar-text" href="#">ĐIỀU KHIỂN THIẾT BỊ</a>
+                    </li>
+                    <li class="flex items-center mb-2">
+                        <i class="fas fa-seedling mr-2"></i>
+                        <a class="text-gray-700 sidebar-text" href="crop-prediction.html">KHUYẾN NGHỊ CÂY TRỒNG</a>
+                    </li>
+                    <li class="flex items-center mb-2">
+                        <i class="fas fa-leaf mr-2"></i>
+                        <a class="text-gray-700 sidebar-text" href="plant-selection.html">LỰA CHỌN CÂY TRỒNG</a>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-question-circle mr-2"></i>
+                        <a class="text-gray-700 sidebar-text" href="help.html">HỖ TRỢ</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Main Panel -->
+            <div class="md:col-span-7 main-content bg-white p-4 rounded shadow"id="main-content">
+                <!-- Device Controls -->
+                <div class="grid grid-cols-2 gap-8 mb-8">
+                    <!-- Đèn -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                        <h3 class="text-xl font-semibold mb-4">Đèn</h3>
+                        <div class="mb-4">
+                            <img id="light-image" src="../static/img/light-off.png" alt="Đèn" class="w-32 h-32 mx-auto">
+                        </div>
+                        <div class="flex justify-center space-x-4 mb-4">
+                            <div class="toggle device-onoff" id="light-onoff" data-device="light"></div>
+                        </div>
+                    </div>
+
+                    <!-- Mái che -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                        <h3 class="text-xl font-semibold mb-4">Mái che</h3>
+                        <div class="mb-4">
+                            <img id="roof-image" src="../static/img/roof-closed.png" alt="Mái che" class="w-32 h-32 mx-auto">
+                        </div>
+                        <div class="flex justify-center space-x-4 mb-4">
+                            <div class="toggle device-onoff" id="roof-onoff" data-device="roof"></div>
+                        </div>
+                    </div>
+
+                    <!-- Máy bơm -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                        <h3 class="text-xl font-semibold mb-4">Máy bơm</h3>
+                        <div class="mb-4">
+                            <img id="pump-image" src="../static/img/pump-off.png" alt="Máy bơm" class="w-32 h-32 mx-auto">
+                        </div>
+                        <div class="flex justify-center space-x-4 mb-4">
+                            <div class="toggle device-onoff" id="pump-onoff" data-device="pump"></div>
+                        </div>
+                    </div>
+
+                    <!-- Quạt -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                        <h3 class="text-xl font-semibold mb-4">Quạt</h3>
+                        <div class="mb-4">
+                            <img id="fan-image" src="../static/img/fan-off.png" alt="Quạt" class="w-32 h-32 mx-auto">
+                        </div>
+                        <div class="flex justify-center space-x-4 mb-4">
+                            <div class="toggle device-onoff" id="fan-onoff" data-device="fan"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timer Section -->
+                <div class="timer-container">
+                    <h2>Hẹn giờ</h2>
+                    <div id="timer-loading" class="hidden">
+                        <div class="flex justify-center items-center mt-4">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                            <span class="ml-2">Đang xử lý...</span>
+                        </div>
+                    </div>
+                    <div id="timer-success" class="hidden">
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mt-4" role="alert">
+                            <span class="block sm:inline" id="timer-success-message"></span>
+                        </div>
+                    </div>
+                    <div id="timer-error" class="hidden">
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4" role="alert">
+                            <span class="block sm:inline" id="timer-error-message"></span>
+                        </div>
+                    </div>
+                    <table class="timer-table">
+                        <tr>
+                            <th>Tên Thiết Bị</th>
+                            <th>Ngày Bật</th>
+                            <th>Thời Gian Bật</th>
+                            <th>Ngày Tắt</th>
+                            <th>Thời Gian Tắt</th>
+                            <th>Mỗi Ngày</th>
+                            <th style="width: 100px;">Bật Hẹn Giờ</th>
+                            <th style="width: 100px;">Xóa Hẹn Giờ</th>
+                        </tr>
+                        <tr>
+                            <td>Đèn</td>
+                            <td><input type="date" class="date-input" id="light-on-date"></td>
+                            <td><input type="time" id="light-on-time"></td>
+                            <td><input type="date" class="date-input" id="light-off-date"></td>
+                            <td><input type="time" id="light-off-time"></td>
+                            <td><input type="checkbox" class="daily-toggle" id="light-daily"></td>
+                            <td class="toggle-container"><div class="toggle timer-toggle" id="light-timer-toggle" data-device="light"></div></td>
+                            <td><button class="clear-timer-btn" onclick="clearTimer('light')">Xóa</button></td>
+                        </tr>
+                        <tr>
+                            <td>Mái che</td>
+                            <td><input type="date" name="onDate" class="date-input" id="roof-on-date"></td>
+                            <td><input type="time" name="onTime" id="roof-on-time"></td>
+                            <td><input type="date" name="offDate" class="date-input" id="roof-off-date"></td>
+                            <td><input type="time" name="offTime" id="roof-off-time"></td>
+                            <td><input type="checkbox" name="daily" class="daily-toggle" id="roof-daily"></td>
+                            <td class="toggle-container"><div class="toggle timer-toggle" id="roof-timer-toggle" data-device="roof"></div></td>
+                            <td><button class="clear-timer-btn" onclick="clearTimer('roof')">Xóa</button></td>
+                        </tr>
+                        <tr>
+                            <td>Máy Bơm</td>
+                            <td><input type="date" name="onDate" class="date-input" id="pump-on-date"></td>
+                            <td><input type="time" name="onTime" id="pump-on-time"></td>
+                            <td><input type="date" name="offDate" class="date-input" id="pump-off-date"></td>
+                            <td><input type="time" name="offTime" id="pump-off-time"></td>
+                            <td><input type="checkbox" name="daily" class="daily-toggle" id="pump-daily"></td>
+                            <td class="toggle-container"><div class="toggle timer-toggle" id="pump-timer-toggle" data-device="pump"></div></td>
+                            <td><button class="clear-timer-btn" onclick="clearTimer('pump')">Xóa</button></td>
+                        </tr>
+                        <tr>
+                            <td>Quạt</td>
+                            <td><input type="date" name="onDate" class="date-input" id="fan-on-date"></td>
+                            <td><input type="time" name="onTime" id="fan-on-time"></td>
+                            <td><input type="date" name="offDate" class="date-input" id="fan-off-date"></td>
+                            <td><input type="time" name="offTime" id="fan-off-time"></td>
+                            <td><input type="checkbox" name="daily" class="daily-toggle" id="fan-daily"></td>
+                            <td class="toggle-container"><div class="toggle timer-toggle" id="fan-timer-toggle" data-device="fan"></div></td>
+                            <td><button class="clear-timer-btn" onclick="clearTimer('fan')">Xóa</button></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+             <!-- Right Sidebar -->
+             <div class="md:col-span-3 bg-white p-4 rounded shadow">
+                <h2 class="section-title">THÔNG BÁO</h2>
+                <div class="notification-section">
+                    <div class="notification-frame" id="right-notification-list"></div>
+                </div>
+
+                <h2 class="section-title">LỊCH</h2>
+                <div class="calendar-section">
+                    <iframe class="calendar-iframe" frameborder="0" scrolling="no" src="https://calendar.google.com/calendar/embed?src=your_calendar_id&ctz=Asia%2FHo_Chi_Minh" style="border: 0"></iframe>
+                </div>
+
+                <h2 class="section-title">DỰ BÁO THỜI TIẾT</h2>
+                <div class="forecast-section">
+                    <div id="forecast-display" class="text-center text-sm"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Contact Section -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4">Liên hệ với chúng tôi</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Địa chỉ</h3>
+                    <p>Số 97 Man Thiện, phường Tăng Nhơn Phú, thành phố Hồ Chí Minh</p>
+                    <h3 class="text-xl font-semibold mt-4 mb-2">Liên hệ</h3>
+                    <p><i class="fas fa-phone-alt mr-2"></i>0344 982 128</p>
+                    <p><i class="fas fa-envelope mr-2"></i>n21dcdt071@student.ptithcm.edu.vn</p>
+                    <div class="flex mt-4">
+                        <a class="text-blue-600 mr-2" href="https://www.facebook.com/share/17ZDigTbQn/"><i class="fab fa-facebook-square fa-2x"></i></a>
+                        <a class="text-red-600 mr-2" href="https://www.youtube.com/@phucvu539"><i class="fab fa-youtube fa-2x"></i></a>
+                        <a class="text-black mr-2" href="https://www.tiktok.com/@p17h11"><i class="fab fa-tiktok fa-2x"></i></a>
+                        <a class="text-blue-400 mr-2" href="#"><i class="fab fa-twitter fa-2x"></i></a>
+                        <a class="text-blue-700" href="https://www.linkedin.com/in/th%C3%A1i-l%C3%AA-b08765357/"><i class="fab fa-linkedin fa-2x"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <iframe allowfullscreen="" class="w-full h-64" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps/place/97+Man+Thi%E1%BB%87n,+Hi%E1%BB%87p+Ph%C3%BA,+Th%E1%BB%A7+%C4%90%E1%BB%A9c,+Th%C3%A0nh+ph%E1%BB%91+H%E1%BB%93+Ch%C3%AD+Minh,+Vi%E1%BB%87t+Nam/@10.8532259,106.7887116,17z/data=!3m1!4b1!4m6!3m5!1s0x3175276bb4ab134f:0xb5b03aa9be1219d2!8m2!3d10.8532259!4d106.7912865!16s%2Fg%2F11svdbcq5g?hl=vi&entry=ttu&g_ep=EgoyMDI1MTEwNC4xIKXMDSoASAFQAw%3D%3D"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bot Icon -->
+    <a href="https://discordapp.com/oauth2/authorize?client_id=1375457943885058179" target="_blank"
+       class="fixed bottom-6 right-6 bg-white p-2 rounded-full shadow-lg hover:bg-gray-100 transition-all transform hover:scale-110">
+        <img src="../static/img/chatbot-icon.png" alt="Chatbot" class="w-12 h-12">
+    </a>
+
+    <script src="../static/common.js"></script>
+    <script src="../static/device-control.js"></script>
+    <script src="../static/websocket-client.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.getElementById('main-content');
+
+            sidebar.addEventListener('mouseenter', function() {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('main-content-expanded');
+            });
+
+            sidebar.addEventListener('mouseleave', function() {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('main-content-expanded');
+            });
+
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('main-content-expanded');
+        });
+    </script>
+
+    <script>
+        // Cấu hình MQTT
+        window.MQTT_CONFIG = {
+            host: '',  
+            port: 8884,
+            userName: '',  
+            password: ''   
+        };
+    </script>
+
+    <div class="form-group">
+        <label>
+            <input type="checkbox" id="daily-checkbox" onchange="handleDailyCheckboxChange(this)">
+            Mỗi ngày
+        </label>
+    </div>
+</body>
+</html>
