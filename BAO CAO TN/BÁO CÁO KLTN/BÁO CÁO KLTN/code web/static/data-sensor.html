@@ -1,0 +1,232 @@
+<!--data-sensor.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>AIOT - Dữ liệu cảm biến</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../static/styles.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="custom-bg">
+    <div class="container mx-auto p-4">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-4 h-20 custom-header text-white">
+            <div class="flex items-center flex-1">
+                <div class="logo-container">
+                    <img src="../static/img/logo.png" alt="Logo" id="logo">
+                </div>
+                <div class="flex-1 text-center header-content">
+                    <h1 class="text-2xl font-bold">HỆ THỐNG GIÁM SÁT CHẤT LƯỢNG ĐẤT</h1>
+                </div>
+            </div>
+            <div class="relative flex items-center">
+                <div class="mr-4">
+                    <span id="current-time" class="text-white text-xl font-bold"></span>
+                </div>
+                <div class="relative inline-block mr-4">
+                    <i class="fas fa-bell text-white text-2xl cursor-pointer" id="notification-icon"></i>
+                    <span class="notification-badge" id="notification-count">0</span>
+                    <div id="notification-content" class="absolute right-0 mt-2 w-64 bg-white rounded shadow-lg hidden z-10">
+                        <div class="p-2 notification-list"></div>
+                    </div>
+                </div>
+                <div class="relative inline-block mr-4">
+                    <img src="../static/img/logo1.jpeg" alt="Logo" class="rounded-full w-10 h-10 object-contain"/>
+                </div>
+                <a class="logout-btn text-white px-4 py-2 rounded mr-6 hover:bg-red-600 transform hover:scale-105 transition-all duration-300 hover:shadow-lg" href="#">Đăng xuất</a>
+            </div>
+        </div>
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <!-- Sidebar -->
+            <div class="md:col-span-2 bg-white p-4 rounded shadow sidebar">
+                <ul class="sidebar-menu">
+                    <li class="flex items-center mb-4 active">
+                        <i class="fas fa-th-large mr-2 custom-sidebar-icon"></i>
+                        <a class="text-gray-700 sidebar-text" href="#">DỮ LIỆU CẢM BIẾN</a>
+                    </li>
+                    <li class="flex items-center mb-4">
+                        <i class="fas fa-chart-line mr-2 custom-sidebar-icon"></i>
+                        <a class="text-gray-700 sidebar-text" href="chart.html">BIỂU ĐỒ</a>
+                    </li>
+                    <li class="flex items-center mb-4">
+                        <i class="fas fa-cogs mr-2 custom-sidebar-icon"></i>
+                        <a class="text-gray-700 sidebar-text" href="device-control.html">ĐIỀU KHIỂN THIẾT BỊ</a>
+                    </li>
+                    <li class="flex items-center mb-4">
+                        <i class="fas fa-seedling mr-2 custom-sidebar-icon"></i>
+                        <a class="text-gray-700 sidebar-text" href="crop-prediction.html">KHUYẾN NGHỊ CÂY TRỒNG</a>
+                    </li>
+                    <li class="flex items-center mb-4">
+                        <i class="fas fa-leaf mr-2 custom-sidebar-icon"></i>
+                        <a class="text-gray-700 sidebar-text" href="plant-selection.html">LỰA CHỌN CÂY TRỒNG</a>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-question-circle mr-2 custom-sidebar-icon"></i>
+                        <a class="text-gray-700 sidebar-text" href="help.html">HỖ TRỢ</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Main Panel -->
+            <div class="md:col-span-7 main-content bg-white p-4 rounded shadow"id="main-content">
+                <div class="grid grid-cols-3 gap-4 mb-4">
+                    <div class="custom-card p-4 rounded">
+                        <div class="data-title">NHIỆT ĐỘ</div>
+                        <div class="data-value" id="temperature">- <span class="data-unit">°C</span></div>
+                    </div>
+                    <div class="custom-card p-4 rounded">
+                        <div class="data-title">ĐỘ ẨM</div>
+                        <div class="data-value" id="humidity">- <span class="data-unit">%</span></div>
+                    </div>
+                    <div class="custom-card p-4 rounded">
+                        <div class="data-title">PH</div>
+                        <div class="data-value" id="ph">-</div>
+                    </div>
+                    <div class="custom-card p-4 rounded">
+                        <div class="data-title">NITƠ</div>
+                        <div class="data-value" id="nitrogen">- <span class="data-unit">mg/kg</span></div>
+                    </div>
+                    <div class="custom-card p-4 rounded">
+                        <div class="data-title">PHỐT PHO</div>
+                        <div class="data-value" id="phosphorus">- <span class="data-unit">mg/kg</span></div>
+                    </div>
+                    <div class="custom-card p-4 rounded">
+                        <div class="data-title">KALI</div>
+                        <div class="data-value" id="potassium">- <span class="data-unit">mg/kg</span></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4 mx-auto max-w-lg">
+                    <div class="custom-card p-4 rounded">
+                        <div class="data-title">LƯỢNG MƯA HÔM NAY</div>
+                        <div class="data-value" id="rainfall">- <span class="data-unit">mm</span></div>
+                    </div>
+                    <div class="custom-card p-4 rounded">
+                        <div class="data-title">LƯỢNG MƯA THÁNG TRƯỚC</div>
+                        <div class="data-value" id="monthly_rainfall">- <span class="data-unit">mm</span></div>
+                    </div>
+                </div>
+                
+                <div class="custom-card p-4 rounded">
+                    <h2 class="history-title">LỊCH SỬ</h2>
+                    <!-- Bộ lọc dữ liệu lịch sử -->
+                    <div class="mb-4">
+                        <div class="flex flex-wrap items-center gap-2 justify-center">
+                            <label for="history-start-date" class="mr-2">Từ:</label>
+                            <input type="datetime-local" id="history-start-date" class="border rounded px-2 py-1 mr-2">
+                            <label for="history-end-date" class="mr-2">Đến:</label>
+                            <input type="datetime-local" id="history-end-date" class="border rounded px-2 py-1 mr-2">
+                        </div>
+                        <div class="flex gap-2 mt-2 justify-center">
+                            <button id="history-filter-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">LỌC DỮ LIỆU</button>
+                            <button id="history-reset-btn" class="bg-gray-400 text-white px-3 py-1 rounded hover:bg-gray-500">RESET</button>
+                            <button id="export-excel-btn" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">IN BÁO CÁO</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Thời gian</th>
+                                    <th>Nhiệt độ</th>
+                                    <th>Độ ẩm</th>
+                                    <th>Lượng mưa</th>
+                                    <th>N</th>
+                                    <th>P</th>
+                                    <th>K</th>
+                                    <th>PH</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Right Sidebar -->
+            <div class="md:col-span-3 bg-white p-4 rounded shadow">
+                <h2 class="section-title">THÔNG BÁO</h2>
+                <div class="notification-section">
+                    <div class="notification-frame" id="right-notification-list"></div>
+                </div>
+                
+                <h2 class="section-title">LỊCH</h2>
+                <div class="calendar-section">
+                    <iframe class="calendar-iframe" frameborder="0" scrolling="no" src="https://calendar.google.com/calendar/embed?src=your_calendar_id&ctz=Asia%2FHo_Chi_Minh" style="border: 0"></iframe>
+                </div>
+                
+                <h2 class="section-title">DỰ BÁO THỜI TIẾT</h2>
+                <div class="forecast-section">
+                    <div id="forecast-display" class="text-center text-sm"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Contact Section -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4">Liên hệ với chúng tôi</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Địa chỉ</h3>
+                    <p>Số 97 Man Thiện, phường Tăng Nhơn Phú, thành phố Hồ Chí Minh</p>
+                    <h3 class="text-xl font-semibold mt-4 mb-2">Liên hệ</h3>
+                    <p><i class="fas fa-phone-alt mr-2"></i>0344 982 128</p>
+                    <p><i class="fas fa-envelope mr-2"></i>n21dcdt071@student.ptithcm.edu.vn</p>
+                    <div class="flex mt-4">
+                        <a class="text-blue-600 mr-2" href="https://www.facebook.com/share/17ZDigTbQn/"><i class="fab fa-facebook-square fa-2x"></i></a>
+                        <a class="text-red-600 mr-2" href="https://www.youtube.com/@phucvu539"><i class="fab fa-youtube fa-2x"></i></a>
+                        <a class="text-black mr-2" href="https://www.tiktok.com/@p17h11"><i class="fab fa-tiktok fa-2x"></i></a>
+                        <a class="text-blue-400 mr-2" href="#"><i class="fab fa-twitter fa-2x"></i></a>
+                        <a class="text-blue-700" href="https://www.linkedin.com/in/th%C3%A1i-l%C3%AA-b08765357/"><i class="fab fa-linkedin fa-2x"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <iframe allowfullscreen="" class="w-full h-64" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps/place/97+Man+Thi%E1%BB%87n,+Hi%E1%BB%87p+Ph%C3%BA,+Th%E1%BB%A7+%C4%90%E1%BB%A9c,+Th%C3%A0nh+ph%E1%BB%91+H%E1%BB%93+Ch%C3%AD+Minh,+Vi%E1%BB%87t+Nam/@10.8486234,106.7843194,17z/data=!3m1!4b1!4m6!3m5!1s0x3175271340a6595f:0x5abdd635ed1d3923!8m2!3d10.8486234!4d106.7868943!16s%2Fg%2F11wb272hyt?hl=vi&entry=ttu&g_ep=EgoyMDI1MTEwNC4xIKXMDSoASAFQAw%3D%3D"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bot Icon -->
+    <a href="https://discordapp.com/oauth2/authorize?client_id=1375457943885058179" target="_blank" 
+       class="fixed bottom-6 right-6 bg-white p-2 rounded-full shadow-lg hover:bg-gray-100 transition-all transform hover:scale-110">
+        <img src="../static/img/chatbot-icon.png" alt="Chatbot" class="w-12 h-12">
+    </a>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="../static/common.js"></script>
+    <script src="../static/websocket-client.js"></script>
+    
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const sidebar = document.querySelector('.sidebar');
+          const mainContent = document.getElementById('main-content');
+      
+          sidebar.addEventListener('mouseenter', function() {
+            sidebar.classList.remove('collapsed');
+            mainContent.classList.remove('main-content-expanded');
+          });
+      
+          sidebar.addEventListener('mouseleave', function() {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('main-content-expanded');
+          });
+      
+          // Khởi tạo sidebar ở trạng thái thu nhỏ
+          sidebar.classList.add('collapsed');
+          mainContent.classList.add('main-content-expanded');
+        });
+      </script>
+      
+</body>
+</html>

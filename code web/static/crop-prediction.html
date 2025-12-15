@@ -1,0 +1,260 @@
+<!--crop-prediction.html--> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>AIOT - Khuyến nghị cây trồng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../static/styles.css"/>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-4 h-20 custom-header text-white">
+            <div class="flex items-center flex-1">
+                <div class="logo-container">
+                    <img src="../static/img/logo.png" alt="Logo" id="logo">
+                </div>
+                <div class="flex-1 text-center header-content">
+                    <h1 class="text-2xl font-bold">HỆ THỐNG GIÁM SÁT CHẤT LƯỢNG ĐẤT</h1>
+                </div>
+            </div>
+            <div class="relative flex items-center">
+                <div class="mr-4">
+                    <span id="current-time" class="text-white text-xl font-bold"></span>
+                </div>
+                <div class="relative inline-block mr-4">
+                    <i class="fas fa-bell text-white text-2xl cursor-pointer" id="notification-icon"></i>
+                    <span class="notification-badge" id="notification-count">0</span>
+                    <div id="notification-content" class="absolute right-0 mt-2 w-64 bg-white rounded shadow-lg hidden z-10">
+                        <div class="p-2 notification-list"></div>
+                    </div>
+                </div>
+                <div class="relative inline-block mr-4">
+                    <img src="../static/img/logo1.jpeg" alt="Logo" class="rounded-full w-10 h-10 object-contain"/>
+                </div>
+                <a class="logout-btn text-white px-4 py-2 rounded mr-6 hover:bg-red-600 transform hover:scale-105 transition-all duration-300 hover:shadow-lg" href="#">Đăng xuất</a>
+            </div>
+        </div>
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <!-- Sidebar -->           
+            <div class="md:col-span-2 bg-white p-4 rounded shadow sidebar">
+                <ul class="sidebar-menu">
+                    <li class="flex items-center mb-2">
+                        <i class="fas fa-th-large mr-2"></i>
+                        <a class="text-gray-700 sidebar-text" href="data-sensor.html">DỮ LIỆU CẢM BIẾN</a>
+                    </li>
+                    <li class="flex items-center mb-2">
+                        <i class="fas fa-chart-line mr-2"></i>
+                        <a class="text-gray-700 sidebar-text" href="chart.html">BIỂU ĐỒ</a>
+                    </li>
+                    <li class="flex items-center mb-2">
+                        <i class="fas fa-cogs mr-2"></i>
+                        <a class="text-gray-700 sidebar-text" href="device-control.html">ĐIỀU KHIỂN THIẾT BỊ</a>
+                    </li>
+                    <li class="flex items-center mb-2 active">
+                        <i class="fas fa-seedling mr-2"></i>
+                        <a class="text-gray-700 sidebar-text" href="#">KHUYẾN NGHỊ CÂY TRỒNG</a>
+                    </li>
+                    <li class="flex items-center mb-2">
+                        <i class="fas fa-leaf mr-2"></i>
+                        <a class="text-gray-700 sidebar-text" href="plant-selection.html">LỰA CHỌN CÂY TRỒNG</a>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-question-circle mr-2"></i>
+                        <a class="text-gray-700 sidebar-text" href="help.html">HỖ TRỢ</a>
+                    </li>
+                </ul>
+            </div>
+
+            <script>
+              document.addEventListener('DOMContentLoaded', function() {
+                const sidebar = document.querySelector('.sidebar');                                      
+                sidebar.addEventListener('mouseenter', function() {
+                  sidebar.classList.remove('collapsed');
+                });               
+                sidebar.addEventListener('mouseleave', function() {
+                  sidebar.classList.add('collapsed');
+                });
+                sidebar.classList.add('collapsed');
+              });
+            </script>
+            <script
+              type="module"
+              src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+            ></script>
+            <script
+              nomodule
+              src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+            ></script>
+            <!-- Main Panel -->
+            <div class="md:col-span-7 main-content bg-white p-4 rounded shadow"id="main-content">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-bold mb-6 text-center">KHUYẾN NGHỊ CÂY TRỒNG PHÙ HỢP</h2>
+
+                    <div class="text-center mb-6">
+                        <div class="image-container mx-auto">
+                            <img src="../static/img/plants/default-plant.jpg" 
+                                 alt="Hình ảnh cây trồng" 
+                                 class="plant-image w-48 h-48 object-cover rounded-lg shadow mx-auto"
+                                 loading="lazy"
+                                 decoding="async"
+                                 onerror="this.onerror=null; this.src='../static/img/plants/default-plant.jpg';">
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form id="prediction-form" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="N">
+                                    Nitrogen (N) (mg/kg)
+                                </label>
+                                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                       id="N" name="N" type="number" step="0.01" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="P">
+                                    Phosphorus (P) (mg/kg)
+                                </label>
+                                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                       id="P" name="P" type="number" step="0.01" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="K">
+                                    Potassium (K) (mg/kg)
+                                </label>
+                                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                       id="K" name="K" type="number" step="0.01" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="temperature">
+                                    Nhiệt độ (°C)
+                                </label>
+                                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                       id="temperature" name="temperature" type="number" step="0.01" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="humidity">
+                                    Độ ẩm (%)
+                                </label>
+                                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                       id="humidity" name="humidity" type="number" step="0.01" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="ph">
+                                    pH
+                                </label>
+                                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                       id="ph" name="ph" type="number" step="0.01" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="total_rainfall">
+                                    Lượng mưa tháng trước (mm)
+                                </label>
+                                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                       id="total_rainfall" name="total_rainfall" type="number" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-center">
+                            <button type="button" id="quick-fill-btn" 
+                                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-4">
+                                Điền Nhanh
+                            </button>
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" 
+                                    type="submit">
+                                Khuyến nghị
+                            </button>
+                        </div>
+                    </form>
+                    <div id="result" class="mt-4 text-center hidden">
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                            <span class="block sm:inline" id="prediction-text"></span>
+                        </div>
+                    </div>
+                    <div id="error" class="mt-4 text-center hidden">
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                            <span class="block sm:inline" id="error-text"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Right Sidebar -->
+            <div class="md:col-span-3 bg-white p-4 rounded shadow">
+                <h2 class="section-title">THÔNG BÁO</h2>
+                <div class="notification-section">
+                    <div class="notification-frame" id="right-notification-list"></div>
+                </div>
+                
+                <h2 class="section-title">LỊCH</h2>
+                <div class="calendar-section">
+                    <iframe class="calendar-iframe" frameborder="0" scrolling="no" src="https://calendar.google.com/calendar/embed?src=your_calendar_id&ctz=Asia%2FHo_Chi_Minh" style="border: 0"></iframe>
+                </div>
+                
+                <h2 class="section-title">DỰ BÁO THỜI TIẾT</h2>
+                <div class="forecast-section">
+                    <div id="forecast-display" class="text-center text-sm"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Contact Section -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4">Liên hệ với chúng tôi</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Địa chỉ</h3>
+                    <p>Số 97 Man Thiện,phường Tăng Nhơn Phú, thành phố Hồ Chí Minh</p>
+                    <h3 class="text-xl font-semibold mt-4 mb-2">Liên hệ</h3>
+                    <p><i class="fas fa-phone-alt mr-2"></i>0344 982 128</p>
+                    <p><i class="fas fa-envelope mr-2"></i>n21dcdt071@student.ptithcm.edu.vn</p>
+                    <div class="flex mt-4">
+                        <a class="text-blue-600 mr-2" href="https://www.facebook.com/share/17ZDigTbQn/"><i class="fab fa-facebook-square fa-2x"></i></a>
+                        <a class="text-red-600 mr-2" href="https://www.youtube.com/@phucvu539"><i class="fab fa-youtube fa-2x"></i></a>
+                        <a class="text-black mr-2" href="https://www.tiktok.com/@p17h11"><i class="fab fa-tiktok fa-2x"></i></a>
+                        <a class="text-blue-400 mr-2" href="#"><i class="fab fa-twitter fa-2x"></i></a>
+                        <a class="text-blue-700" href="https://www.linkedin.com/in/th%C3%A1i-l%C3%AA-b08765357/"><i class="fab fa-linkedin fa-2x"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <iframe allowfullscreen="" class="w-full h-64" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="http://google.com/maps/place/97+Man+Thi%E1%BB%87n,+Hi%E1%BB%87p+Ph%C3%BA,+Th%E1%BB%A7+%C4%90%E1%BB%A9c,+Th%C3%A0nh+ph%E1%BB%91+H%E1%BB%93+Ch%C3%AD+Minh,+Vi%E1%BB%87t+Nam/@10.8532259,106.7887116,17z/data=!3m1!4b1!4m6!3m5!1s0x3175276bb4ab134f:0xb5b03aa9be1219d2!8m2!3d10.8532259!4d106.7912865!16s%2Fg%2F11svdbcq5g?hl=vi&entry=ttu&g_ep=EgoyMDI1MTEwNC4xIKXMDSoASAFQAw%3D%3D"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bot Icon -->
+    <a href="https://discordapp.com/oauth2/authorize?client_id=1375457943885058179" target="_blank" 
+       class="fixed bottom-6 right-6 bg-white p-2 rounded-full shadow-lg hover:bg-gray-100 transition-all transform hover:scale-110">
+        <img src="../static/img/chatbot-icon.png" alt="Chatbot" class="w-12 h-12">
+    </a>
+
+    <!-- Scripts -->
+    <script src="../static/common.js"></script>
+    <script src="../static/crop-prediction.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const sidebar = document.querySelector('.sidebar');
+          const mainContent = document.getElementById('main-content');
+      
+          sidebar.addEventListener('mouseenter', function() {
+            sidebar.classList.remove('collapsed');
+            mainContent.classList.remove('main-content-expanded');
+          });
+      
+          sidebar.addEventListener('mouseleave', function() {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('main-content-expanded');
+          });
+      
+          // Khởi tạo sidebar ở trạng thái thu nhỏ
+          sidebar.classList.add('collapsed');
+          mainContent.classList.add('main-content-expanded');
+        });
+      </script>
+</body>
+</html>
